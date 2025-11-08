@@ -1,61 +1,144 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "itertools.h"
 
 namespace cpputils
 {
 using std::string;
 using std::vector;
 
-vector<string> split(const string& str, const string& delim)
+enum class SplitSteps
 {
-    vector<string> results;
-    const int strLen = str.length();
-    const int delLen = delim.length();
-    const int lastDel = strLen - delLen;
-    int start = 0;
+    End=0,
+    Ending=1,
+    Running=2
+};
 
-    // If string is empty, return empty results.
-    if(strLen == 0)
-    {
-        return results;
-    }
+class SplitIterator
+{
+    public:
+    using difference_type = std::ptrdiff_t;
+    using value_type = std::string;
+    using pointer = std::string*;
+    using reference = std::string&;
+    using iterator_category = std::input_iterator_tag;
 
-    // If delim is empty, put whole string in result
-    if(delLen == 0)
-    {
-        results.push_back(str);
-        return results;
-    }
+    constexpr SplitIterator():
+    str(""),
+    strLen(0),
+    delim(""),
+    delLen(0),
+    lastDel(0),
+    start(0),
+    step(SplitSteps::End)
+    {}
 
-    while(start < strLen)
+    constexpr SplitIterator(const string& str, const string& delim):
+    str(str),
+    strLen(str.length()),
+    delim(delim),
+    delLen(delim.length()),
+    lastDel(strLen-delLen),
+    start(0),
+    step(SplitSteps::Running)
     {
-        int pos = str.find(delim, start);
-        if(pos < 0)
+        if(strLen == 0)
         {
-            string slice = str.substr(start);
-            results.push_back(slice);
-            break;
+            step = SplitSteps::End;
+        }
+        else if(delLen == 0)
+        {
+            slice = str;
+            step = SplitSteps::Ending;
         }
         else
         {
-            int sliceLen = pos - start;
-            string slice = str.substr(start, sliceLen);
-            results.push_back(slice);
-            start = pos + delLen;
-        }
-        // special case for if the string ends with a deliminator
-        if(pos == lastDel)
-        {
-            results.push_back("");
-            break;
+            // advance to capture first slice
+            ++*this;
         }
     }
 
-    return results;
+    constexpr string operator * () const
+    {
+        return slice;
+    }
+
+    constexpr SplitIterator& operator ++()
+    {
+        if(step == SplitSteps::End)
+        {
+            // done, do nothing
+        }
+        else if(step == SplitSteps::Ending)
+        {
+            // advance to the end, finished.
+            step = SplitSteps::End;
+        }
+        else if(start >= strLen)
+        {
+            // there is a trailing delim
+            slice = "";
+            step = SplitSteps::Ending;
+        }
+        else
+        {
+            int pos = str.find(delim, start);
+            if(pos < 0)
+            {
+                slice = str.substr(start);
+                step = SplitSteps::Ending;
+            }
+            else
+            {
+                int sliceLen = pos - start;
+                slice = str.substr(start, sliceLen);
+                start = pos + delLen;
+            }
+        }
+
+        return *this;
+    }
+
+    constexpr void operator ++(int)
+    {
+        ++*this;
+    }
+
+    constexpr bool operator == (SplitIterator other) const
+    {
+        // The only reason to compare against another is to check if we are at the end.
+        return step == other.step;
+    }
+
+    constexpr bool operator != (SplitIterator other) const
+    {
+        return step != other.step;
+    }
+
+    private:
+    int start;
+    string str;
+    int strLen;
+    string delim;
+    int delLen;
+    int lastDel;
+    string slice;
+    SplitSteps step;
+};
 }
-vector<string> split(const string& str, char delim)
+
+namespace cpputils
 {
-    return split(str, string(1,delim));
+
+constexpr vector<string> split(const string& str, const string& delim)
+{
+    return vector<string>(SplitIterator(str, delim), SplitIterator());
 }
+
+constexpr vector<string> split(const string& str, char delim)
+{
+    return split(str, string(1, delim));
+}
+
 }

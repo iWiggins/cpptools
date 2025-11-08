@@ -1,11 +1,16 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <string>
 #include <vector>
+#include "cxtools.h"
 #include "stringutils.h"
 #include "doctest/doctest.h"
 
 using namespace cpputils;
 using std::string;
+
+static_assert(std::input_iterator<SplitIterator>);
+constexpr std::vector<string> cxparts() { return split("1,2,3", ","); }
+
 
 TEST_SUITE("String Utils")
 {
@@ -83,4 +88,12 @@ TEST_SUITE("String Utils")
             REQUIRE_EQ("", s);
         }
     }
+    TEST_CASE("split is constexpr")
+    {
+        REQUIRE(Equal<3, cxparts().size()>::result);
+        REQUIRE(Equal<1, strToInt(cxparts()[0])>::result);
+        REQUIRE(Equal<2, strToInt(cxparts()[1])>::result);
+        REQUIRE(Equal<3, strToInt(cxparts()[2])>::result);
+    }
 }
+
