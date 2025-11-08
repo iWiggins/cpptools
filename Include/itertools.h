@@ -145,7 +145,7 @@ class PolyMerge
 
     constexpr iterator begin()
     {
-        return iterator(leftBegin, leftEnd, rightBegin, rightEnd);
+        return cbegin();
     }
     constexpr MergeIterSentinel end()
     {
@@ -153,7 +153,7 @@ class PolyMerge
     }
     constexpr iterator cbegin() const
     {
-        return begin();
+            return iterator(leftBegin, leftEnd, rightBegin, rightEnd);
     }
     constexpr MergeIterSentinel cend() const
     {
