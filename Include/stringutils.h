@@ -1,12 +1,27 @@
 #pragma once
 #include <string>
 #include <vector>
+#include <istream>
+#include <sstream>
 #include "itertools.h"
 
 namespace cpputils
 {
 using std::string;
 using std::vector;
+
+std::stringstream& operator << (std::stringstream& sstr, std::istream& istr)
+{
+    while(!istr.eof())
+    {
+        char c = (char)istr.get();
+        if(c != EOF)
+        {
+            sstr << c;
+        }
+    }
+    return sstr;
+}
 
 enum class SplitSteps
 {
@@ -137,4 +152,102 @@ constexpr vector<string> split(const string& str, char delim)
     return split(str, string(1, delim));
 }
 
+class StreamSplitIterator
+{
+    public:
+    using difference_type = std::ptrdiff_t;
+    using value_type = std::string;
+    using pointer = std::string*;
+    using reference = std::string&;
+    using iterator_category = std::input_iterator_tag;
+
+    StreamSplitIterator():
+    end(true)
+    {}
+
+    StreamSplitIterator(std::istream& stream, const string& delim):
+    stream(&stream),
+    delim(delim),
+    end(stream.eof())
+    {
+        if(!end)
+        {
+            if(delim.length() == 0)
+            {
+                std::stringstream str;
+                buffer = (str << stream).str();
+                end = true;
+            }
+            else
+            {
+                // advance to buffer first slice
+                ++*this;
+            }
+        }
+    }
+
+    string operator * () const
+    {
+        return buffer;
+    }
+
+    StreamSplitIterator& operator ++()
+    {
+        if(!end)
+        {
+            buffer.clear();
+            while(!stream->eof() && !buffer.ends_with(delim))
+            {
+                char c = (char)stream->get();
+                if(c != EOF)
+                {
+                    buffer += c;
+                }
+            }
+            if(buffer.ends_with(delim))
+            {
+                buffer = buffer.substr(0, buffer.length()-delim.length());
+            }
+            else
+            {
+                end = true;
+            }
+        }
+        return *this;
+    }
+
+    void operator ++(int)
+    {
+        ++*this;
+    }
+
+    bool operator == (StreamSplitIterator other) const
+    {
+        // The only reason to compare against another is to check if we are at the end.
+        return end == other.end;
+    }
+
+    bool operator != (StreamSplitIterator other) const
+    {
+        return end != other.end;
+    }
+
+    private:
+    std::istream* stream;
+    string buffer;
+    string delim;
+    bool end;
+};
+
+StreamSplitIterator split(std::istream& str, const string& delim)
+{
+    return StreamSplitIterator(str, delim);
 }
+
+StreamSplitIterator split(std::istream& str, char delim)
+{
+    return split(str, string(1, delim));
+}
+
+}
+
