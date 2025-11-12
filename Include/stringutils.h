@@ -126,10 +126,6 @@ class SplitIterator
     string slice;
     SplitSteps step;
 };
-}
-
-namespace cpputils
-{
 
 constexpr vector<string> split(const string& str, const string& delim)
 {
