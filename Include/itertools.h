@@ -55,8 +55,6 @@ private:
     bool consumed;
 };
 
-class MergeIterSentinel{};
-
 template <typename T, std::input_iterator leftIt, std::sentinel_for<leftIt> leftSt, std::input_iterator rightIt, std::sentinel_for<rightIt> rightSt>
 class MergeIter
 {
@@ -70,12 +68,17 @@ using self = MergeIter<T, leftIt, leftSt, rightIt, rightSt>;
     using reference = T&;
     using iterator_category = std::input_iterator_tag;
 
+    constexpr MergeIter():
+    sentinel(true)
+    {}
+
     constexpr MergeIter(leftIt leftBegin, leftSt leftEnd, rightIt rightBegin, rightSt rightEnd):
     leftCurr(leftBegin),
     leftEnd(leftEnd),
     rightCurr(rightBegin),
     rightEnd(rightEnd),
-    left(true)
+    left(true),
+    sentinel(false)
     {}
  
     constexpr T operator*() const
@@ -111,14 +114,38 @@ using self = MergeIter<T, leftIt, leftSt, rightIt, rightSt>;
         ++*this;
     }
 
-    constexpr bool operator == (const MergeIterSentinel sent) const
+    constexpr bool operator == (const MergeIter other) const
     {
-        return !left && rightCurr == rightEnd;
+        if(other.sentinel)
+        {
+            return !left && rightCurr == rightEnd;
+        }
+        else
+        {
+            return
+                left &&
+                leftCurr == other.leftCurr
+                ||
+                !left &&
+                rightCurr == other.rightCurr;
+        }
     }
 
-    constexpr bool operator != (const MergeIterSentinel sent) const
+    constexpr bool operator != (const MergeIter other) const
     {
-        return left || rightCurr != rightEnd;
+        if(other.sentinel)
+        {
+            return left || rightCurr != rightEnd;
+        }
+        else
+        {
+            return
+                left &&
+                leftCurr != other.leftCurr
+                ||
+                !left &&
+                rightCurr != other.rightCurr;
+        }
     }
 
 private:
@@ -128,6 +155,7 @@ private:
     rightIt rightCurr;
     rightSt rightEnd;
     bool left;
+    bool sentinel;
 };
 
 template <typename T, std::input_iterator leftIt, std::sentinel_for<leftIt> leftSt, std::input_iterator rightIt, std::sentinel_for<rightIt> rightSt>
@@ -135,6 +163,9 @@ class PolyMerge
 {
     public:
     using iterator = MergeIter<T, leftIt, leftSt, rightIt, rightSt>;
+
+    constexpr PolyMerge()
+    {} // calls base class constructor implicitly.
 
     constexpr PolyMerge(leftIt leftBegin, leftSt leftEnd, rightIt rightBegin, rightSt rightEnd):
     leftBegin(leftBegin),
@@ -147,15 +178,15 @@ class PolyMerge
     {
         return cbegin();
     }
-    constexpr MergeIterSentinel end()
+    constexpr iterator end()
     {
-        return MergeIterSentinel();
+        return iterator();
     }
     constexpr iterator cbegin() const
     {
             return iterator(leftBegin, leftEnd, rightBegin, rightEnd);
     }
-    constexpr MergeIterSentinel cend() const
+    constexpr iterator cend() const
     {
         return end();
     }
@@ -170,6 +201,8 @@ template <typename T, std::input_iterator leftIt, std::input_iterator rightIt>
 class BiMerge: public PolyMerge<T, leftIt, leftIt, rightIt, rightIt>
 {
     public:
+    constexpr BiMerge()
+    {} // calls base class constructor implicitly.
     constexpr BiMerge(leftIt leftBegin, leftIt leftEnd, rightIt rightBegin, rightIt rightEnd):
     PolyMerge<T, leftIt, leftIt, rightIt, rightIt>(leftBegin, leftEnd, rightBegin, rightEnd)
     {}
@@ -179,6 +212,8 @@ template <typename T, std::input_iterator it, std::sentinel_for<it> st>
 class MonoMerge: public PolyMerge<T, it, st, it, st>
 {
     public:
+    constexpr MonoMerge()
+    {} // calls base class constructor implicitly.
     constexpr MonoMerge(it leftBegin, st leftEnd, it rightBegin, st rightEnd):
     PolyMerge<T, it, st, it, st>(leftBegin, leftEnd, rightBegin, rightEnd)
     {}
@@ -188,6 +223,8 @@ template <typename T, std::input_iterator it>
 class Merge: public PolyMerge<T, it, it, it, it>
 {
     public:
+    constexpr Merge()
+    {} // calls base class constructor implicitly.
     constexpr Merge(it leftBegin, it leftEnd, it rightBegin, it rightEnd):
     PolyMerge<T, it, it, it, it>(leftBegin, leftEnd, rightBegin, rightEnd)
     {}
