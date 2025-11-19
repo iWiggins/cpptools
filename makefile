@@ -1,4 +1,4 @@
-
+testall: teststringutils testitertools testcxtools
 
 teststringutils: tests/bin/stringutilstests
 	./tests/bin/stringutilstests
