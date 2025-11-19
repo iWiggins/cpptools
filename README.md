@@ -23,3 +23,11 @@ An iterator over a single value.
 ### MergeIter
 
 The MergeIter classes allow combining two sets of iterators into a single iterator.
+
+## cxtools
+
+Constexpr versions of simple standard functions, like int to str and str to int.
+
+### strToInt
+
+Converts a string to an integer, for any radix. This is a const expression unlike the standard library version.
