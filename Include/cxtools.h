@@ -30,8 +30,8 @@ namespace cpputils
         else
         {
             if(c >= '0' && c <= '9') return c - '0';
-            else if(c >= 'A' && c <= 'Z') return c - 'A' + 10;
-            else if(c >= 'a' && c <= 'z') return c - 'a' + 10;
+            else if(c >= 'A' && c < 'A'+(radix-10)) return c - 'A' + 10;
+            else if(c >= 'a' && c < 'a'+(radix-10)) return c - 'a' + 10;
             // this should never happen.
             else throw std::logic_error("Invalid char to int");
         }
