@@ -67,6 +67,65 @@ namespace cpputils
             return result * sign;
         }
     }
+    char intToChar(int i, int radix = 10)
+    {
+        if(i < 0 || i >= radix)
+        {
+            throw std::invalid_argument("i is not a single digit");
+        }
+
+        if(radix <= 10)
+        {
+            return '0' + i;
+        }
+        else
+        {
+            if(i >= 0 && i < 10)
+            {
+                return '0' + i;
+            }
+            else
+            {
+                return 'A' + (i - 10);
+            }
+        }
+    }
+    constexpr std::string intToStr(int number, int radix = 10)
+    {
+        // special case for 0
+        if(number == 0)
+        {
+            return std::string(1, '0');
+        }
+
+        bool neg = number < 0;
+        int offset = neg ? 1 : 0;
+        if(neg) number *= -1;
+
+        // first, count the digits
+        int num = number;
+        int digits = 0;
+        while(num > 0)
+        {
+            num /= radix;
+            ++digits;
+        }
+        // create a string of sifficient length, plus one if negative
+        std::string result(digits + offset, '0');
+        // if negative, add a minus
+        if(neg) result[0] = '-';
+
+        // place digits into the string in reverse order
+        num = number;
+        for(int i = digits-1+offset; i >= offset; --i)
+        {
+            int digit = num % radix;
+            result[i] = intToChar(digit, radix);
+            num /= radix;
+        }
+
+        return result;
+    }
     template <int left, int right>
     struct Equal
     {

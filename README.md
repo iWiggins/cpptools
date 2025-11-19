@@ -30,4 +30,8 @@ Constexpr versions of simple standard functions, like int to str and str to int.
 
 ### strToInt
 
-Converts a string to an integer, for any radix. This is a const expression unlike the standard library version.
+Converts a string to an integer, for any radix. This is a const expression.
+
+### intToStr
+
+Converts an integer to a string, for any radix. This is a const expression.

@@ -135,3 +135,66 @@ TEST_SUITE("strToInt")
         REQUIRE_EQ(1, result);
     }
 }
+TEST_SUITE("intToStr")
+{
+    TEST_CASE("0 is 0")
+    {
+        int i = 0;
+        string result = intToStr(i);
+        REQUIRE_EQ("0", result);
+    }
+    TEST_CASE("Decimal digit converts")
+    {
+        int i = 5;
+        string result = intToStr(i);
+        REQUIRE_EQ("5", result);
+    }
+    TEST_CASE("Decimal number converts")
+    {
+        int i = 123;
+        string result = intToStr(i);
+        REQUIRE_EQ("123", result);
+    }
+    TEST_CASE("Negative decimal converts")
+    {
+        int i = -864;
+        string result = intToStr(i);
+        REQUIRE_EQ("-864", result);
+    }
+    TEST_CASE("Hex digit converts")
+    {
+        int i = 0xC;
+        string result = intToStr(i, 16);
+        REQUIRE_EQ("C", result);
+    }
+    TEST_CASE("Hex number converts")
+    {
+        int i = 0x1AC4;
+        string result = intToStr(i, 16);
+        REQUIRE_EQ("1AC4", result);
+    }
+    TEST_CASE("Negative hex converts")
+    {
+        int i = -0x2FF;
+        string result = intToStr(i, 16);
+        REQUIRE_EQ("-2FF", result);
+    }
+    TEST_CASE("Bin digit converts")
+    {
+        int i = 1;
+        string result = intToStr(i, 2);
+        REQUIRE_EQ("1", result);
+    }
+    TEST_CASE("Bin number converts")
+    {
+        int i = 10;
+        string result = intToStr(i, 2);
+        REQUIRE_EQ("1010", result);
+    }
+    TEST_CASE("Negative bin number converts")
+    {
+        int i = -7;
+        string result = intToStr(i, 2);
+        REQUIRE_EQ("-111", result);
+    }
+}
