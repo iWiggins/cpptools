@@ -12,7 +12,6 @@ using std::string;
 static_assert(std::input_iterator<SplitIterator>);
 constexpr std::vector<string> cxparts() { return split("1,2,3", ","); }
 
-
 TEST_SUITE("Constexpr Split")
 {
     TEST_CASE("Comma Separated List")

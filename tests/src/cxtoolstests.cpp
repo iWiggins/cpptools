@@ -1,11 +1,35 @@
 #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <string>
 #include <vector>
+#include <ranges>
 #include "cxtools.h"
+#include "letters.h"
 #include "doctest/doctest.h"
 
 using std::string;
 using namespace cpputils;
+
+TEST_SUITE("Letters Tests")
+{
+    TEST_CASE("Lowercase Letters")
+    {
+        auto lowercase = lowercase_letters();
+        int i = 0;
+        for(char letter = 'a'; letter <= 'z'; ++letter)
+        {
+            REQUIRE_EQ(letter, lowercase[i++]);
+        }
+    }
+    TEST_CASE("Uppercase Letters")
+    {
+        auto uppercase = uppercase_letters();
+        int i = 0;
+        for(char letter = 'A'; letter <= 'Z'; ++letter)
+        {
+            REQUIRE_EQ(letter, uppercase[i++]);
+        }
+    }
+}
 
 TEST_SUITE("isDigit")
 {
@@ -196,5 +220,29 @@ TEST_SUITE("intToStr")
         int i = -7;
         string result = intToStr(i, 2);
         REQUIRE_EQ("-111", result);
+    }
+}
+TEST_SUITE("lower-upper")
+{
+    TEST_CASE("uppercase character becomes lowercase")
+    {
+        auto uppers = uppercase_letters();
+        auto lowers = lowercase_letters();
+
+        for(int i = 0; i < uppers.size(); ++i)
+        {
+            REQUIRE_EQ(lowers[i], toLower(uppers[i]));
+        }
+    }
+
+    TEST_CASE("lowercase character becomes uppercase")
+    {
+        auto uppers = uppercase_letters();
+        auto lowers = lowercase_letters();
+
+        for(int i = 0; i < uppers.size(); ++i)
+        {
+            REQUIRE_EQ(uppers[i], toUpper(lowers[i]));
+        }
     }
 }

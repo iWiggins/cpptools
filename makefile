@@ -30,10 +30,10 @@ testcxtools: tests/bin/cxtoolstests
 debugcxtools: tests/bin/cxtoolstests_d
 	@echo Ready for debugging.
 
-tests/bin/cxtoolstests: tests/src/cxtoolstests.cpp Include/cxtools.h | tests/bin
+tests/bin/cxtoolstests: tests/src/cxtoolstests.cpp Include/cxtools.h Include/letters.h | tests/bin
 	g++ -std=c++23 -o tests/bin/cxtoolstests -I Include tests/src/cxtoolstests.cpp
 
-tests/bin/cxtoolstests_d: tests/src/cxtoolstests.cpp Include/cxtools.h | tests/bin
+tests/bin/cxtoolstests_d: tests/src/cxtoolstests.cpp Include/cxtools.h Include/letters.h | tests/bin
 	g++ -std=c++23 -o tests/bin/cxtoolstests_d -I Include -g -Og tests/src/cxtoolstests.cpp
 
 tests/bin:

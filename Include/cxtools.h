@@ -126,6 +126,32 @@ namespace cpputils
 
         return result;
     }
+    constexpr char toLower(char c)
+    {
+        return c < 'a' ? c + 0x20 : c;
+    }
+    constexpr char toUpper(char c)
+    {
+        return c > 'Z' ? c - 0x20 : c;
+    }
+    constexpr std::string toLower(const std::string& str)
+    {
+        std::string result(str);
+        for(int i = 0; i < result.size(); ++i)
+        {
+            result[i] = toLower(result[i]);
+        }
+        return result;
+    }
+    constexpr std::string toUpper(const std::string& str)
+    {
+        std::string result(str);
+        for(int i = 0; i < result.size(); ++i)
+        {
+            result[i] = toUpper(result[i]);
+        }
+        return result;
+    }
     template <int left, int right>
     struct Equal
     {
