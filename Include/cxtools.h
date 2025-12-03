@@ -110,7 +110,7 @@ namespace cpputils
             num /= radix;
             ++digits;
         }
-        // create a string of sifficient length, plus one if negative
+        // create a string of sufficient length, plus one if negative
         std::string result(digits + offset, '0');
         // if negative, add a minus
         if(neg) result[0] = '-';
