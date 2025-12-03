@@ -35,3 +35,11 @@ Converts a string to an integer, for any radix. This is a const expression.
 ### intToStr
 
 Converts an integer to a string, for any radix. This is a const expression.
+
+### toLower
+
+Converts a string/char from uppercase to lowercase, leaving lowercase characters alone. This is a const expression.
+
+### toUpper
+
+Converts a a string/char from lowercase to uppercase, leaving uppercase characters alone. This is a const expression.
