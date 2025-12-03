@@ -12,7 +12,7 @@ Splits a string or character stream based on a delimiter.
 
 The string split is a const expression, returning a vector of strings.
 
-The stream split evaluates lazily, returning an iterator.
+The stream split evaluates lazily, returning an iterator. A default constructed StreamSplitIterator is a sentinel.
 
 ## itertools
 
