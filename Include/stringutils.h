@@ -162,7 +162,8 @@ class StreamSplitIterator
     using iterator_category = std::input_iterator_tag;
 
     StreamSplitIterator():
-    stream(nullptr)
+    stream(nullptr),
+    read(true)
     {}
 
     StreamSplitIterator(std::istream& stream, const string& delim):
@@ -190,7 +191,7 @@ class StreamSplitIterator
     }
 
     StreamSplitIterator& operator ++()
-    {        
+    {
         if(delim.length() == 0)
         {
             if(!stream->eof())
@@ -199,14 +200,18 @@ class StreamSplitIterator
                 // read whole stream. Buffer is now unread.
                 read = false;
                 std::stringstream str;
-            buffer = (str << *stream).str();
+                for(char c = stream->get(); c != EOF; c = stream->get())
+                {
+                    str.put(c);
+                }
+                buffer = str.str();
             }
             
         }
         else
         {
             buffer.clear();
-            while(!stream->eof() && !buffer.ends_with(delim))
+            while(!buffer.ends_with(delim))
             {
                 char c = (char)stream->get();
                 if(c != EOF)
@@ -214,6 +219,11 @@ class StreamSplitIterator
                     // buffer was modified, it is unread
                     read = false;
                     buffer += c;
+                }
+                else
+                {
+                    // end of stream found, break
+                    break;
                 }
             }
             if(buffer.ends_with(delim))
@@ -246,12 +256,11 @@ class StreamSplitIterator
     private:
     bool eof() const
     {
-        return stream == nullptr || stream->eof();
+        return stream == nullptr || (read && stream->peek() == EOF);
     }
     std::istream* stream;
     string buffer;
     string delim;
-    bool end;
     bool read;
 };
 
