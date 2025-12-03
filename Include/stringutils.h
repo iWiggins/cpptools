@@ -162,38 +162,48 @@ class StreamSplitIterator
     using iterator_category = std::input_iterator_tag;
 
     StreamSplitIterator():
-    end(true)
+    stream(nullptr)
     {}
 
     StreamSplitIterator(std::istream& stream, const string& delim):
     stream(&stream),
     delim(delim),
-    end(stream.eof())
+    buffer(""),
+    read(true)
+    {}
+
+    string operator * ()
     {
-        if(!end)
+        if(!read)
         {
-            if(delim.length() == 0)
-            {
-                std::stringstream str;
-                buffer = (str << stream).str();
-                end = true;
-            }
-            else
-            {
-                // advance to buffer first slice
-                ++*this;
-            }
+            // if we have not read the current buffered value, read it.
+            read = true;
+            return buffer;
+        }
+        else
+        {
+            // otherwise, advance first, then read it.
+            ++*this;
+            read = true;
+            return buffer;
         }
     }
 
-    string operator * () const
-    {
-        return buffer;
-    }
-
     StreamSplitIterator& operator ++()
-    {
-        if(!end)
+    {        
+        if(delim.length() == 0)
+        {
+            if(!stream->eof())
+            {
+                // If not at end of stream and there is no delim,
+                // read whole stream. Buffer is now unread.
+                read = false;
+                std::stringstream str;
+            buffer = (str << *stream).str();
+            }
+            
+        }
+        else
         {
             buffer.clear();
             while(!stream->eof() && !buffer.ends_with(delim))
@@ -201,16 +211,14 @@ class StreamSplitIterator
                 char c = (char)stream->get();
                 if(c != EOF)
                 {
+                    // buffer was modified, it is unread
+                    read = false;
                     buffer += c;
                 }
             }
             if(buffer.ends_with(delim))
             {
                 buffer = buffer.substr(0, buffer.length()-delim.length());
-            }
-            else
-            {
-                end = true;
             }
         }
         return *this;
@@ -223,20 +231,28 @@ class StreamSplitIterator
 
     bool operator == (StreamSplitIterator other) const
     {
-        // The only reason to compare against another is to check if we are at the end.
-        return end == other.end;
+        // if this iter has a null stream, it is being used as a sentinel
+        if(stream == nullptr) return other.eof();
+        else return eof();
     }
 
     bool operator != (StreamSplitIterator other) const
     {
-        return end != other.end;
+        // if this iter has a null stream, it is being used as a sentinel
+        if(stream == nullptr) return !other.eof();
+        else return !eof();
     }
 
     private:
+    bool eof() const
+    {
+        return stream == nullptr || stream->eof();
+    }
     std::istream* stream;
     string buffer;
     string delim;
     bool end;
+    bool read;
 };
 
 StreamSplitIterator split(std::istream& str, const string& delim)

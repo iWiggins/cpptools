@@ -10,7 +10,9 @@ String functions missing from the standard library.
 
 Splits a string or character stream based on a delimiter.
 
-The string split is a const expression.
+The string split is a const expression, returning a vector of strings.
+
+The stream split evaluates lazily, returning an iterator.
 
 ## itertools
 

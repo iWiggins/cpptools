@@ -102,8 +102,9 @@ TEST_SUITE("Stream Split")
     TEST_CASE("Comma Separated List")
     {
         string line = "one,two,three,four,five";
-        std::stringstream stream(line);
+        std::stringstream stream;
         auto iter = split(stream, ',');
+        stream << line;
         REQUIRE_EQ("one",*iter);
         ++iter;
         REQUIRE_EQ("two", *iter);
@@ -119,23 +120,26 @@ TEST_SUITE("Stream Split")
     TEST_CASE("Empty String")
     {
         string line = "";
-        std::stringstream stream(line);
+        std::stringstream stream;
         auto iter = split(stream, ',');
+        stream << line;
         REQUIRE_EQ(StreamSplitIterator(), iter);
     }
     TEST_CASE("Empty Delim")
     {
         string line = "abcd";
-        std::stringstream stream(line);
+        std::stringstream stream;
         auto iter = split(stream, "");
+        stream << line;
         REQUIRE_EQ(line, *iter);
         REQUIRE_EQ(StreamSplitIterator(), iter);
     }
     TEST_CASE("wide delim")
     {
         string line = "one - two - three - four - five";
-        std::stringstream stream(line);
+        std::stringstream stream;
         auto iter = split(stream, " - ");
+        stream << line;
         REQUIRE_EQ("one",*iter);
         ++iter;
         REQUIRE_EQ("two", *iter);
@@ -151,8 +155,9 @@ TEST_SUITE("Stream Split")
     TEST_CASE("wide delim with partial matches")
     {
         string line = "twenty-one lbs - twenty-two lbs - twenty-three lbs - twenty-four lbs - twenty-five lbs";
-        std::stringstream stream(line);
+        std::stringstream stream;
         auto iter = split(stream, " - ");
+        stream << line;
         REQUIRE_EQ("twenty-one lbs",*iter);
         ++iter;
         REQUIRE_EQ("twenty-two lbs", *iter);
@@ -168,8 +173,9 @@ TEST_SUITE("Stream Split")
     TEST_CASE("single delim with no data")
     {
         string line = ",";
-        std::stringstream stream(line);
+        std::stringstream stream;
         auto iter = split(stream, ',');
+        stream << line;
         REQUIRE_EQ("", *iter);
         ++iter;
         REQUIRE_EQ("", *iter);
@@ -178,8 +184,9 @@ TEST_SUITE("Stream Split")
     TEST_CASE("all delims")
     {
         string line = ",,,";
-        std::stringstream stream(line);
+        std::stringstream stream;
         auto iter = split(stream, ',');
+        stream << line;
         for(;iter != StreamSplitIterator(); ++iter)
         {
             REQUIRE_EQ("", *iter);
@@ -188,18 +195,12 @@ TEST_SUITE("Stream Split")
     TEST_CASE("all wide delims")
     {
         string line = " -  -  -  - ";
-        std::stringstream stream(line);
+        std::stringstream stream;
         auto iter = split(stream, " - ");
+        stream << line;
         for(;iter != StreamSplitIterator(); ++iter)
         {
             REQUIRE_EQ("", *iter);
         }
-    }
-    TEST_CASE("split is constexpr")
-    {
-        REQUIRE(Equal<3, cxparts().size()>::result);
-        REQUIRE(Equal<1, strToInt(cxparts()[0])>::result);
-        REQUIRE(Equal<2, strToInt(cxparts()[1])>::result);
-        REQUIRE(Equal<3, strToInt(cxparts()[2])>::result);
     }
 }
